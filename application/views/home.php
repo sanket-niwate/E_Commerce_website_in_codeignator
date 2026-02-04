@@ -452,13 +452,47 @@
     </style>
 </head>
 
-<body>
+<body class="home-page">
     <?php $this->load->view('layout/navbar'); ?>
 
-    <!-- Hero Sweeper -->
+    <script>
+    // Add home-specific class to navbar AFTER it's loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.querySelector('.navbar-custom');
+        if (navbar) {
+            navbar.classList.add('home-transparent');
+            // Force initial state
+            if (window.scrollY < 50) {
+                navbar.classList.remove('scrolled');
+            }
+        }
+
+        // Smooth scroll adjustment for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    const navbarHeight = 100; // Match CSS variable
+                    const targetPosition = targetElement.getBoundingClientRect().top + window
+                        .pageYOffset - navbarHeight;
+
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    });
+    </script>
+
+    <!-- Hero Sweeper - FULL VIEWPORT HEIGHT -->
     <section class="hero-sweeper">
         <img src="<?= base_url('assets/images/home/horse rider.jpg'); ?>" alt="The Tack Shop">
-
         <div class="hero-content">
             <h1>THE TACK SHOP</h1>
             <p>Premium equestrian essentials for horse & rider</p>
@@ -469,7 +503,7 @@
     </section>
 
     <!-- BANNER SECTION -->
-    <section class="home-banner container">
+    <section class="home-banner">
         <div>
             <h1 class="banner-title">
                 <div class="banner-icons my-4">
@@ -486,71 +520,69 @@
     </section>
 
     <!-- SERVICE SECTION -->
-    <section class="service-section container">
-        <div class="row">
-            <div class="col-md-4 service-box">
-                <img data-src="//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=10"
-                    sizes="100vw"
-                    data-srcset="//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=400 400w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=2000 2000w"
-                    alt="Free Shipping" class="image lazy entered loaded" data-ll-status="loaded"
-                    srcset="//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=400 400w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=2000 2000w"
-                    src="//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&amp;width=10">
-                <h5>Free Shipping</h5>
-                <p>For local orders over $399</p>
-            </div>
-
-            <div class="col-md-4 service-box">
-                <img data-src="//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=10" sizes="100vw"
-                    data-srcset="//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=400 400w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/store.svg?v=132181699&amp;width=2000 2000w"
-                    alt="Store Pickup" class="image lazy entered loaded" data-ll-status="loaded"
-                    srcset="//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=400 400w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=2000 2000w"
-                    src="//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&amp;width=10">
-                <h5>Store Pickup</h5>
-                <p>Collect as soon as today</p>
-            </div>
-
-            <div class="col-md-4 service-box">
-                <img data-src="//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=10" sizes="100vw"
-                    data-srcset="//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=400 400w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/1732181704&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=2000 2000w"
-                    alt="Easy Returns" class="image lazy entered loaded" data-ll-status="loaded"
-                    srcset="//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=100 100w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=200 200w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=300 300w,//thetackshop.sg/cdn/shop/files/return.svg?v=173218174=400 400w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=500 500w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=600 600w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=700 700w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=800 800w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=900 900w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1000 1000w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1100 1100w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1200 1200w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=1500 1500w,//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=2000 2000w"
-                    src="//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&amp;width=10">
-                <h5>Easy Returns</h5>
-                <p>Within 7 days of purchase</p>
+    <section class="service-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 service-box">
+                    <img src="//thetackshop.sg/cdn/shop/files/free_shipping.svg?v=1732181657&width=100"
+                        alt="Free Shipping">
+                    <h5>Free Shipping</h5>
+                    <p>For local orders over $399</p>
+                </div>
+                <div class="col-md-4 service-box">
+                    <img src="//thetackshop.sg/cdn/shop/files/store.svg?v=1732181699&width=100" alt="Store Pickup">
+                    <h5>Store Pickup</h5>
+                    <p>Collect as soon as today</p>
+                </div>
+                <div class="col-md-4 service-box">
+                    <img src="//thetackshop.sg/cdn/shop/files/return.svg?v=1732181704&width=100" alt="Easy Returns">
+                    <h5>Easy Returns</h5>
+                    <p>Within 7 days of purchase</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Product Grid (Commented Out - Your Original Code) -->
-    <!--
-    <div class="container py-5">
-        <h2 class="text-center">Shop Equestrian Essentials</h2>
-        <div class="row">
-            <?php if (!empty($products)) {
-            foreach ($products as $p) { ?>
-            <div class="col-lg-3 col-md-4 col-sm-6">
-                <div class="product-card">
-                    <img src="<?= base_url('assets/images/products/' . $p->image); ?>" alt="<?= $p->name; ?>">
-                    <div class="product-body">
-                        <div class="product-name"><?= $p->name; ?></div>
-                        <div class="product-price">S$<?= number_format($p->price, 2); ?></div>
-                        <a href="<?= site_url('product/view/' . $p->id); ?>" class="btn btn-dark btn-sm mt-3 w-100">
-                            VIEW PRODUCT
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <?php }
-        } else { ?>
-            <p class="text-center">No products available.</p>
-            <?php } ?>
-        </div>
-    </div>
-    -->
-
     <?php $this->load->view('layout/footer'); ?>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+    // Enhanced scroll handling for home page
+    document.addEventListener('DOMContentLoaded', function() {
+        const navbar = document.querySelector('.navbar-custom.home-transparent');
+        if (!navbar) return;
+
+        let lastScroll = 0;
+        const navbarHeight = 100; // Match CSS variable
+
+        window.addEventListener('scroll', function() {
+            const currentScroll = window.pageYOffset;
+
+            // Show/hide navbar on scroll
+            if (currentScroll <= 0) {
+                navbar.classList.remove('scrolled');
+                return;
+            }
+
+            // Scrolled down
+            if (currentScroll > lastScroll && currentScroll > navbarHeight) {
+                navbar.classList.add('scrolled');
+            }
+            // Scrolled up
+            else if (currentScroll < lastScroll) {
+                navbar.classList.add('scrolled');
+            }
+
+            lastScroll = currentScroll;
+        });
+
+        // Initial check
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        }
+    });
+    </script>
 </body>
 
 </html>

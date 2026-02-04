@@ -7,7 +7,8 @@ class Admin extends CI_Controller {
     {
         parent::__construct();
         $this->load->model('Product_Model');
-        $this->load->library('pagination');
+        $this->load->model('Admin_Model');
+        $this->load->library('pagination','session');
     }
 
     // Show add product + product list
@@ -112,5 +113,48 @@ class Admin extends CI_Controller {
 
         $this->load->view('orders_list', $data);
     }
+
+
+
+
+    public function login()
+{
+    if ($this->input->post()) {
+
+        $email    = trim($this->input->post('email'));
+        $password = $this->input->post('password');
+
+        // 1️⃣ Check admin by email
+        $admin = $this->Admin_Model->get_admin_email($email);
+
+        if (!$admin) {
+            $this->session->set_flashdata('error', 'Email not registered');
+            redirect('admin/login');
+        }
+
+       // 2️⃣ Check admin status
+        if ($admin->status !== 'active') {
+            $this->session->set_flashdata('error', 'Account is inactive');
+            redirect('admin/login');
+        }
+
+        // 3️⃣ Verify password
+        if (!password_verify($password, $admin->password)) {
+            $this->session->set_flashdata('error', 'Wrong password');
+            redirect('admin/login');
+        }
+
+        // ✅ Login success
+        $this->session->set_userdata([
+            'admin_id' => $admin->id,
+            'role'     => $admin->role,
+            'logged_in'=> true
+        ]);
+
+        redirect('admin/orders');
+    }
+
+    $this->load->view('admin/admin_login');
+}
 
 }

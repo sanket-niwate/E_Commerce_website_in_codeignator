@@ -3,94 +3,92 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Order_Model extends CI_Model {
 
-    // Create order (before payment)
-    public function create_order($customer, $total)
-    {
+    // ✅ CORRECTED: Uses ONLY columns that exist in your orders table
+    public function create_order($user_id, $total_amount) {
         $data = [
-            'name'           => $customer['name'] ?? 'Guest',
-            'email'          => $customer['email'] ?? '',
-            'phone'          => $customer['phone'] ?? '',
-            'address'        => $customer['address'] ?? '',
-            'total'          => $total,
+            'user_id'        => (int)$user_id,
+            'total_amount'   => (float)$total_amount, // NOT 'total' - matches your DB
+            'status'         => 'pending',
             'payment_status' => 'pending',
             'created_at'     => date('Y-m-d H:i:s')
         ];
 
-        $this->db->trans_start();
         $this->db->insert('orders', $data);
-        $order_id = $this->db->insert_id();
-        $this->db->trans_complete();
-
-        if ($this->db->trans_status() === FALSE) {
-            log_message('error', 'Order insert failed: ' . $this->db->last_query());
-            return false;
-        }
-
-        return $order_id;
+        return $this->db->insert_id();
     }
 
-    // Mark order as paid
-    public function mark_paid($order_id, $payment_id)
-    {
-        $this->db->where('id', $order_id);
-        $this->db->update('orders', [
-            'payment_id'     => $payment_id,
-            'payment_status' => 'success'
-        ]);
+    // ✅ CORRECTED: Updates ONLY existing columns (no payment_id in orders table)
+  public function mark_paid($order_id) {
+    log_message('debug', 'Order_Model::mark_paid() called with order_id: ' . $order_id);
+    
+    $result = $this->db->where('id', $order_id)
+                       ->update('orders', [
+                           'status'         => 'processing',
+                           'payment_status' => 'paid',
+                           'updated_at'     => date('Y-m-d H:i:s')
+                       ]);
+    
+    if (!$result) {
+        log_message('error', 'Order_Model::mark_paid() FAILED. DB Error: ' . $this->db->error()['message']);
+        log_message('error', 'Order_Model::mark_paid() Last Query: ' . $this->db->last_query());
+    } else {
+        log_message('info', 'Order_Model::mark_paid() SUCCESS for order_id: ' . $order_id);
     }
-
-    // Save order items (use correct table name: order_item)
-    public function save_items($order_id, $cart)
-    {
-        if (empty($cart)) return false;
-
-        $items = [];
-        foreach ($cart as $item) {
-            $items[] = [
-                'order_id'     => $order_id,
-                'product_id'   => $item['id'],
-                'product_name' => $item['name'],
-                'price'        => $item['price'],
-                'qty'          => $item['qty']
-            ];
-        }
-
-        $this->db->insert_batch('order_items', $items);
-        if ($this->db->affected_rows() == 0) {
-            log_message('error', 'Order items insert failed for order_id: ' . $order_id);
-            return false;
-        }
-
-        return true;
-    }
-
-    public function get_all_orders()
-{
-    return $this->db
-        ->order_by('id', 'DESC')
-        ->get('orders')
-        ->result_array();
+    
+    return $result;
 }
 
 
-public function get_order_items($order_id)
-{
-    return $this->db
-        ->where('order_id', $order_id)
-        ->get('order_items')
-        ->result_array();
+
+    // ✅ CORRECTED: Uses 'quantity' (not 'qty') and calculates line 'total'
+   public function save_items($order_id, $cart) {
+    log_message('debug', 'Order_Model::save_items() called with order_id: ' . $order_id . ', cart items: ' . count($cart));
+    
+    if (empty($cart)) {
+        log_message('warning', 'Order_Model::save_items() cart is empty');
+        return false;
+    }
+
+    $items = [];
+    foreach ($cart as $item) {
+        $items[] = [
+            'order_id'   => $order_id,
+            'product_id' => (int)$item['id'],
+            'quantity'   => (int)$item['qty'],
+            'price'      => (float)$item['price'],
+            'total'      => (float)($item['price'] * $item['qty'])
+        ];
+    }
+
+    log_message('debug', 'Order_Model::save_items() prepared items: ' . print_r($items, true));
+    
+    $result = $this->db->insert_batch('order_items', $items);
+    
+    if (!$result) {
+        log_message('error', 'Order_Model::save_items() FAILED. DB Error: ' . $this->db->error()['message']);
+        log_message('error', 'Order_Model::save_items() Last Query: ' . $this->db->last_query());
+    } else {
+        log_message('info', 'Order_Model::save_items() SUCCESS. Inserted ' . count($items) . ' items for order_id: ' . $order_id);
+    }
+    
+    return $result;
 }
 
-public function get_orders_with_items()
-{
-    return $this->db
-        ->select('o.*, oi.product_name, oi.price, oi.qty')
-        ->from('orders o')
-        ->join('order_items oi', 'oi.order_id = o.id', 'left')
-        ->order_by('o.id', 'DESC')
-        ->get()
-        ->result_array();
-}
+    // Admin methods (fixed column names)
+    public function get_all_orders() {
+        return $this->db
+            ->select('orders.*, users.name as customer_name, users.email')
+            ->from('orders')
+            ->join('users', 'users.id = orders.user_id', 'left')
+            ->order_by('orders.id', 'DESC')
+            ->get()
+            ->result_array();
+    }
 
-
+    public function get_order_items($order_id) {
+        return $this->db
+            ->where('order_id', $order_id)
+            ->get('order_items')
+            ->result_array();
+    }
 }
